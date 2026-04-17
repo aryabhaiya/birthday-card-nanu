@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Nanu!</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #8fd694;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.wrapper { width: 100%; max-width: 360px; padding: 20px; }
+
+.envelope {
+  width: 100%; aspect-ratio: 3/2;
+  background: #ff6f91;
+  position: relative; cursor: pointer;
+  border-radius: 12px; perspective: 1000px;
+  display: flex; justify-content: center; align-items: center;
+  color: white; font-size: 18px; font-weight: bold;
+}
+
+.flap {
+  position: absolute; width: 100%; height: 50%;
+  background: #ff9671; top: 0; left: 0;
+  transform-origin: top; transition: transform 1s ease;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 2;
+}
+
+.letter {
+  position: absolute;
+  width: 92%;
+  background: white;
+  border-radius: 10px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, 60%);
+  display: flex; flex-direction: column;
+  align-items: center;
+  transition: transform 1s ease, opacity 0.5s ease;
+  padding: 16px;
+  opacity: 0;
+}
+
+.open .flap { transform: rotateX(-180deg); z-index: 0; }
+.open .letter { transform: translate(-50%, -50%); opacity: 1; }
+
+.message {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  transition: opacity 0.4s;
+}
+.open .message { opacity: 0; }
+
+.collage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.collage img, .center {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 8px;
+}
+
+.collage img {
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.center {
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: #ff4d6d;
+  font-size: 8px;
+  padding: 10px;
+  background: #fff0f3;
+}
+
+/* popup */
+.popup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.popup img {
+  width: 70%;
+  max-width: 260px;
+  border-radius: 10px;
+}
+
+.caption {
+  color: white;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* note box */
+.note-box {
+  position: absolute;
+  bottom: 20px;
+  width: 90%;
+  max-width: 360px;
+  background: rgba(255,255,255,0.9);
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.note-box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="envelope" onclick="openEnvelope()">
+    <div class="flap"></div>
+
+    <div class="message">
+      Happy Birthday Nanu 🎉<br>
+      Tap to Open
+    </div>
+
+    <div class="letter">
+      <div class="collage">
+        <img src="photos/Nanu_9.jpeg" onclick="showPopup(this,'Phele se hi dog lover')">
+        <img src="photos/Nanu_2.jpeg" onclick="showPopup(this,'That morning after we stayed up the whole night 😂')">
+        <img src="photos/Nanu_3.jpeg" onclick="showPopup(this,'Look how tiny we all were 🥹')">
+        <img src="photos/Nanu_4.jpeg" onclick="showPopup(this,'Turtle paglu 🐢')">
+
+        <div class="center">
+          Happy Birthday Nanu 🐢🐶<br>
+          You grew up way too fast fr 🥹
+        </div>
+
+        <img src="photos/Nanu_7.jpeg" onclick="showPopup(this,'Annoying each other 😝')">
+        <img src="photos/Nanu_6.jpeg" onclick="showPopup(this,'Bachpan se hi cutie 🥹')">
+        <img src="photos/SaBhAnn.jpeg" onclick="showPopup(this,'SaBhAnn Crew 🤟🏻')">
+        <img src="photos/nanu_8.jpeg" onclick="showPopup(this,'Look how short you were 🥹')">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- note -->
+<div class="note-box" id="noteBox"></div>
+
+<!-- popup -->
+<div class="popup" id="popup" onclick="closePopup()">
+  <img id="popupImg">
+  <div class="caption" id="caption"></div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+const noteText = "Nanu, wishing you a veryy Happy Birthday!!! I hope you get everything you want! Wishing you all the happiness and good health! You'll always be my little brother🐢🐶. P.S. Click on the photos. P.P.S. Hope you liked this Website-Card thing. It was my first time making one like this🫶🏻";
+
+let hasTyped = false;
+
+function openEnvelope() {
+  const env = document.querySelector('.envelope');
+
+  if (!env.classList.contains('open')) {
+    env.classList.add('open');
+    startConfetti();
+
+    setTimeout(() => {
+      document.getElementById('noteBox').classList.add('show');
+      typeText();
+    }, 1200);
+  }
+}
+
+function typeText() {
+  if (hasTyped) return;
+  hasTyped = true;
+
+  let i = 0;
+  const speed = 30;
+  const noteBox = document.getElementById('noteBox');
+  noteBox.innerHTML = "";
+
+  function typing() {
+    if (i < noteText.length) {
+      noteBox.innerHTML += noteText.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+function showPopup(img, text) {
+  document.getElementById('popup').style.display = 'flex';
+  document.getElementById('popupImg').src = img.src;
+  document.getElementById('caption').innerText = text;
+}
+
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [], animationId;
+
+function startConfetti() {
+  confetti = [];
+  for (let i = 0; i < 120; i++) {
+    confetti.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*-canvas.height,
+      r: Math.random()*6+2,
+      d: Math.random()*50
+    });
+  }
+  draw();
+
+  setTimeout(() => {
+    cancelAnimationFrame(animationId);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }, 5000);
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+
+  confetti.forEach(c => {
+    ctx.moveTo(c.x,c.y);
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+  });
+
+  ctx.fill();
+
+  confetti.forEach(c => {
+    c.y += Math.cos(c.d)+1.5;
+    c.x += Math.sin(c.d);
+
+    if (c.y > canvas.height) {
+      c.y = -10;
+      c.x = Math.random()*canvas.width;
+    }
+  });
+
+  animationId = requestAnimationFrame(draw);
+}
+</script>
+
+</body>
+</html>
